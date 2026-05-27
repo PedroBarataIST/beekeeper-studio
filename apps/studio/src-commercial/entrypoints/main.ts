@@ -25,10 +25,14 @@ import { uuidv4 } from '@/lib/uuid';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { UtilProcMessage } from '@/types'
 import { manageUpdates } from '@/background/update_manager'
+import { setUpdateLicenseGate } from '@/background/updateLicenseGate'
+import { commercialUpdateLicenseGate } from '@commercial/backend/updateLicenseGate'
 import * as sms from 'source-map-support'
 import { initializeSecurity } from '@/backend/lib/security'
 import { initializeFileHelpers } from '@/backend/lib/FileHelpers'
 import { safeOpenExternal } from '@/background/lib/electron/safeOpenExternal'
+
+setUpdateLicenseGate(commercialUpdateLicenseGate)
 
 if (platformInfo.env.development || platformInfo.env.test) {
   sms.install()

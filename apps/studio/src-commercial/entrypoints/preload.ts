@@ -60,10 +60,44 @@ export const api = {
   onUtilDied(bind: any) {
     ipcRenderer.on('utilDied', bind);
   },
-  onUpdateEvent(event: 'update-available' | 'manual-update' | 'update-downloaded', bind: any) {
-    const eType = ['update-available', 'manual-update', 'update-downloaded'];
+  onUpdateEvent(
+    event:
+      | 'update-available'
+      | 'manual-update'
+      | 'update-downloaded'
+      | 'update-download-progress'
+      | 'update-error'
+      | 'update-license-block',
+    bind: any
+  ) {
+    const eType = [
+      'update-available',
+      'manual-update',
+      'update-downloaded',
+      'update-download-progress',
+      'update-error',
+      'update-license-block',
+    ];
     if (!eType.includes(event)) return;
     ipcRenderer.on(event, bind);
+  },
+  // Dev-only helper: lets the renderer console fire fake update events so
+  // the UI can be smoke-tested without hitting the real updater. No-op in
+  // production builds. ipcRenderer.emit() invokes the listeners registered
+  // via ipcRenderer.on() locally, which is exactly what AutoUpdater.vue
+  // subscribes to through onUpdateEvent().
+  _devFireUpdateEvent(event: string, payload?: unknown) {
+    if (process.env.NODE_ENV === 'production') return;
+    const eType = [
+      'update-available',
+      'manual-update',
+      'update-downloaded',
+      'update-download-progress',
+      'update-error',
+      'update-license-block',
+    ];
+    if (!eType.includes(event)) return;
+    ipcRenderer.emit(event, {}, payload);
   },
   updaterReady() {
     ipcRenderer.send('updater-ready');
